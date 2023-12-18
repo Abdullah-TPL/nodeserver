@@ -12,7 +12,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 client.connect(err => {
  if (err) throw err;
 
- const collection = client.db("<dbname>").collection("devices");
+ const collection = client.db("BLE").collection("devices");
 
  app.post('/data', (req, res) => {
   console.log(req.body);
