@@ -5,7 +5,7 @@ const MongoClient = require('mongodb').MongoClient;
 app.use(express.json());
 
 // Replace <username>, <password>, and <dbname> with your MongoDB Atlas username, password, and database name
-const mongoUri = "mongodb+srv://MERN:mernstack@cluster0.36bh8a0.mongodb.net/?retryWrites=true&w=majority";
+const uri = "mongodb+srv://MERN:mernstack@cluster0.36bh8a0.mongodb.net/?retryWrites=true&w=majority";
 
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
