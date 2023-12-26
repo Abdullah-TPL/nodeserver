@@ -70,7 +70,7 @@
 // connectToMongoDB();
 const express = require('express');
 const app = express();
-const MongoClient = require('mongodb').MongoClient;
+const { MongoClient } = require('mongodb');
 
 app.use(express.json());
 
@@ -87,11 +87,7 @@ async function connectToMongoDB() {
       try {
         console.log(req.body);
 
-        // Check if the client is connected before performing the insert operation
-        if (!client.isConnected()) {
-          throw new Error("MongoDB client is not connected");
-        }
-
+        // Perform the insert operation without checking isConnected
         const result = await collection.insertOne(req.body);
         console.log("1 document inserted");
         res.sendStatus(200);
@@ -101,11 +97,23 @@ async function connectToMongoDB() {
       }
     }
 
-    app.post('/data', handlePostRequest);
+    app.post('/data', async (req, res) => {
+      if (!client.isConnected()) {
+        try {
+          await client.connect();
+        } catch (err) {
+          console.error("Failed to connect to MongoDB:", err);
+          res.status(500).send("Internal Server Error: Failed to connect to MongoDB");
+          return;
+        }
+      }
+
+      await handlePostRequest(req, res);
+    });
 
     app.listen(8080, () => console.log('Server listening on port 8080'));
   } catch (err) {
-    console.error('Failed to connect to MongoDB:', err);
+    console.error('Failed to initialize MongoDB connection:', err);
   }
 }
 
