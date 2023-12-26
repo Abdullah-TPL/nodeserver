@@ -87,14 +87,17 @@ async function connectToMongoDB() {
       try {
         console.log(req.body);
 
+        // Check if the client is connected before performing the insert operation
+        if (!client.isConnected()) {
+          throw new Error("MongoDB client is not connected");
+        }
+
         const result = await collection.insertOne(req.body);
         console.log("1 document inserted");
         res.sendStatus(200);
       } catch (err) {
         console.error("Error inserting document:", err);
         res.status(500).send("Internal Server Error: " + err.message);
-      } finally {
-        client.close();
       }
     }
 
@@ -107,4 +110,5 @@ async function connectToMongoDB() {
 }
 
 connectToMongoDB();
+
 
