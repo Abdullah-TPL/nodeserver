@@ -67,7 +67,6 @@
 //   }
 // }
 
-// connectToMongoDB();
 const express = require('express');
 const app = express();
 const { MongoClient } = require('mongodb');
@@ -80,14 +79,21 @@ const uri = "mongodb+srv://MERN:mernstack@cluster0.36bh8a0.mongodb.net/<dbname>?
 async function connectToMongoDB() {
   try {
     const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    let isConnected = false;
+
     await client.connect();
+    isConnected = true;
+
     const collection = client.db("<dbname>").collection("devices");
 
     async function handlePostRequest(req, res) {
       try {
         console.log(req.body);
 
-        // Perform the insert operation without checking isConnected
+        if (!isConnected) {
+          throw new Error("MongoDB client is not connected");
+        }
+
         const result = await collection.insertOne(req.body);
         console.log("1 document inserted");
         res.sendStatus(200);
@@ -97,19 +103,7 @@ async function connectToMongoDB() {
       }
     }
 
-    app.post('/data', async (req, res) => {
-      if (!client.isConnected()) {
-        try {
-          await client.connect();
-        } catch (err) {
-          console.error("Failed to connect to MongoDB:", err);
-          res.status(500).send("Internal Server Error: Failed to connect to MongoDB");
-          return;
-        }
-      }
-
-      await handlePostRequest(req, res);
-    });
+    app.post('/data', handlePostRequest);
 
     app.listen(8080, () => console.log('Server listening on port 8080'));
   } catch (err) {
@@ -118,5 +112,3 @@ async function connectToMongoDB() {
 }
 
 connectToMongoDB();
-
-
