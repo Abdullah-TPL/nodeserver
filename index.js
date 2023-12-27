@@ -16,7 +16,7 @@
 //     await client.connect();
 //     isConnected = true;
 
-//     const collection = client.db("<dbname>").collection("devices");
+//     const collection = client.db("BLE_Gateway").collection("devices");
 
 //     async function handlePostRequest(req, res) {
 //       try {
