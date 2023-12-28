@@ -71,7 +71,6 @@
 // connectToMongoDB();
 
 //Updated Code
-
 const express = require('express');
 const app = express();
 const { MongoClient } = require('mongodb');
@@ -99,33 +98,44 @@ async function connectToMongoDB() {
           throw new Error("MongoDB client is not connected");
         }
 
-        // Check if the 'data' field is present in the request body
-        if (!req.body.data) {
-          throw new Error("'data' field is missing in the request body");
+        const { devices } = req.body;
+
+        if (!devices || !Array.isArray(devices)) {
+          throw new Error("Invalid 'devices' field in the request body");
         }
 
-        const { data } = req.body;
+        for (const device of devices) {
+          const { mac, data, evtType, rssi } = device;
 
-        // Extract the last part after splitting with '09'
-        const lastPart = data.split('09').pop();
+          if (!mac || !data || !evtType || !rssi) {
+            console.error("Invalid device information:", device);
+            continue; // Skip to the next iteration if the device information is incomplete
+          }
 
-        // Parse the hexadecimal data to UTF-8
-        const parsedData = Buffer.from(lastPart, 'hex').toString('utf-8');
-        
-        console.log("Parsed Data:", parsedData);
+          // Extract the last part after splitting with '09'
+          const lastPart = data.split('09').pop();
 
-        // Add a timestamp to the data before inserting it
-        const dataWithTimestamp = {
-          ...req.body,
-          parsedData,
-          timestamp: new Date()
-        };
+          // Parse the hexadecimal data to UTF-8
+          const parsedData = Buffer.from(lastPart, 'hex').toString('utf-8');
 
-        const result = await collection.insertOne(dataWithTimestamp);
-        console.log("1 document inserted");
+          console.log("Parsed Data:", parsedData);
+
+          // Add a timestamp to the data before inserting it
+          const dataWithTimestamp = {
+            mac,
+            parsedData,
+            evtType,
+            rssi,
+            timestamp: new Date()
+          };
+
+          const result = await collection.insertOne(dataWithTimestamp);
+          console.log("1 document inserted");
+        }
+
         res.sendStatus(200);
       } catch (err) {
-        console.error("Error inserting document:", err);
+        console.error("Error inserting documents:", err);
         res.status(500).send("Internal Server Error: " + err.message);
       }
     }
@@ -154,4 +164,3 @@ async function connectToMongoDB() {
 }
 
 connectToMongoDB();
-
