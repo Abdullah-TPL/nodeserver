@@ -194,7 +194,7 @@ async function connectToMongoDB() {
           res.json(data);
          } else if (name) {
           // If only date is provided, return all data for that specific date
-          const data = await collection.find({ Name }).toArray();
+          const data = await collection.find({ Name: name }).toArray();
           res.json(data);
         }
         } else {
