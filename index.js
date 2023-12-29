@@ -178,9 +178,9 @@ async function connectToMongoDB() {
           throw new Error("MongoDB client is not connected");
         }
 
-        const { mac, date } = req.query;
+        const { mac, date , name } = req.query;
 
-        if (mac && date) {
+        if (mac && date ) {
           // If both mac and date are provided, return data for that specific MAC address and date
           const data = await collection.find({ mac, date }).toArray();
           res.json(data);
