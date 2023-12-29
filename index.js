@@ -93,7 +93,9 @@
 //   } catch (err) {
 //     console.error('Failed to initialize MongoDB connection:', err);
 //   }
+// }
 
+// connectToMongoDB();
 // Updated Code
 const express = require('express');
 const app = express();
@@ -145,14 +147,18 @@ async function connectToMongoDB() {
           console.log("Parsed Data:", Name);
 
           // Add a timestamp to the data with GMT+5 timezone
-          const Time = new Date().toLocaleString('en-US', { timeZone: 'Asia/Karachi' });
+          const timestamp = new Date().toLocaleString('en-US', { timeZone: 'Asia/Karachi' });
+
+          // Separate date and time
+          const [date, time] = timestamp.split(' ');
 
           // Add a timestamp to the data before inserting it
           const dataWithTimestamp = {
             mac,
             Name,
             rssi,
-            Time, 
+            date,
+            time,
           };
 
           const result = await collection.insertOne(dataWithTimestamp);
@@ -176,7 +182,7 @@ async function connectToMongoDB() {
 
         if (mac && date) {
           // If both mac and date are provided, return data for that specific MAC address and date
-          const data = await collection.find({ mac, Time: date }).toArray();
+          const data = await collection.find({ mac, date }).toArray();
           res.json(data);
         } else if (mac) {
           // If only MAC address is provided, return all data for that MAC address
@@ -184,7 +190,7 @@ async function connectToMongoDB() {
           res.json(data);
         } else if (date) {
           // If only date is provided, return all data for that specific date
-          const data = await collection.find({ Time: date }).toArray();
+          const data = await collection.find({ date }).toArray();
           res.json(data);
         } else {
           // If no parameters are provided, return all data
@@ -208,6 +214,5 @@ async function connectToMongoDB() {
 
 connectToMongoDB();
 
-// }
 
-// connectToMongoDB();
+
