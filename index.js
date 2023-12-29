@@ -197,7 +197,7 @@ async function connectToMongoDB() {
           const data = await collection.find({ Name: name }).toArray();
           res.json(data);
         }
-        } else {
+         else {
           // If no parameters are provided, return all data
           const data = await collection.find({}).toArray();
           res.json(data);
