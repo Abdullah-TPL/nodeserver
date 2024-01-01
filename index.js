@@ -116,7 +116,6 @@
 // }
 
 // connectToMongoDB();
-
 const express = require('express');
 const app = express();
 const { MongoClient } = require('mongodb');
@@ -178,7 +177,7 @@ async function connectToMongoDB() {
             Name,
             rssi,
             date,
-            time,
+            time: new Date().toLocaleTimeString('en-US', { timeZone: 'Asia/Karachi', hour12: true }),
           };
 
           const result = await collection.insertOne(dataWithTimestamp);
@@ -233,5 +232,3 @@ async function connectToMongoDB() {
 }
 
 connectToMongoDB();
-
-
