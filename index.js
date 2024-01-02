@@ -241,8 +241,8 @@ async function handleGetRequest(req, res) {
       query.Name = name;
     } else if (date && time) {
       // If only date and time are provided, return all data for that specific date and time
-      query.date = date;
-      query.time = time;
+      const timestamp = `${date} ${time}`;
+      query.timestamp = new Date(timestamp);
     } else if (date) {
       // If only date is provided, return all data for that specific date
       query.date = date;
@@ -258,6 +258,7 @@ async function handleGetRequest(req, res) {
     res.status(500).send("Internal Server Error: " + err.message);
   }
 }
+
 
     app.post('/data', handlePostRequest);
     app.get('/data', handleGetRequest); // Updated endpoint for retrieving data with optional query parameters
