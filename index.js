@@ -191,41 +191,73 @@ async function connectToMongoDB() {
       }
     }
 
-    async function handleGetRequest(req, res) {
-      try {
-        if (!isConnected) {
-          throw new Error("MongoDB client is not connected");
-        }
+    // async function handleGetRequest(req, res) {
+    //   try {
+    //     if (!isConnected) {
+    //       throw new Error("MongoDB client is not connected");
+    //     }
 
-        const { date, name, time } = req.query;
+    //     const { date, name, time } = req.query;
 
-        if (date && name) {
-          // If both date and name are provided, return data for that specific date and name
-          const data = await collection.find({ date, Name: name }).toArray();
-          res.json(data);
-        } else if (date && time) {
-          // If only date is provided, return all data for that specific date
-          const data = await collection.find({ date, time }).toArray();
-          res.json(data);
-        }
-        else if (date) {
-          // If only date is provided, return all data for that specific date
-          const data = await collection.find({ date }).toArray();
-          res.json(data);
-        }else if (name) {
-          // If only name is provided, return all data for that specific name
-          const data = await collection.find({ Name: name }).toArray();
-          res.json(data);
-        } else {
-          // If no parameters are provided, return all data
-          const data = await collection.find({}).toArray();
-          res.json(data);
-        }
-      } catch (err) {
-        console.error("Error retrieving data:", err);
-        res.status(500).send("Internal Server Error: " + err.message);
-      }
+    //     if (date && name) {
+    //       // If both date and name are provided, return data for that specific date and name
+    //       const data = await collection.find({ date, Name: name }).toArray();
+    //       res.json(data);
+    //     } else if (date && time) {
+    //       // If only date is provided, return all data for that specific date
+    //       const data = await collection.find({ date, time }).toArray();
+    //       res.json(data);
+    //     }
+    //     else if (date) {
+    //       // If only date is provided, return all data for that specific date
+    //       const data = await collection.find({ date }).toArray();
+    //       res.json(data);
+    //     }else if (name) {
+    //       // If only name is provided, return all data for that specific name
+    //       const data = await collection.find({ Name: name }).toArray();
+    //       res.json(data);
+    //     } else {
+    //       // If no parameters are provided, return all data
+    //       const data = await collection.find({}).toArray();
+    //       res.json(data);
+    //     }
+    //   } catch (err) {
+    //     console.error("Error retrieving data:", err);
+    //     res.status(500).send("Internal Server Error: " + err.message);
+    //   }
+    // }
+async function handleGetRequest(req, res) {
+  try {
+    if (!isConnected) {
+      throw new Error("MongoDB client is not connected");
     }
+
+    const { date, name, time } = req.query;
+    const query = {};
+
+    if (date && name) {
+      // If both date and name are provided, return data for that specific date and name
+      query.date = date;
+      query.Name = name;
+    } else if (date && time) {
+      // If only date and time are provided, return all data for that specific date and time
+      query.date = date;
+      query.time = time;
+    } else if (date) {
+      // If only date is provided, return all data for that specific date
+      query.date = date;
+    } else if (name) {
+      // If only name is provided, return all data for that specific name
+      query.Name = name;
+    }
+
+    const data = await collection.find(query).toArray();
+    res.json(data);
+  } catch (err) {
+    console.error("Error retrieving data:", err);
+    res.status(500).send("Internal Server Error: " + err.message);
+  }
+}
 
     app.post('/data', handlePostRequest);
     app.get('/data', handleGetRequest); // Updated endpoint for retrieving data with optional query parameters
