@@ -197,17 +197,22 @@ async function connectToMongoDB() {
           throw new Error("MongoDB client is not connected");
         }
 
-        const { date, name } = req.query;
+        const { date, name, time } = req.query;
 
         if (date && name) {
           // If both date and name are provided, return data for that specific date and name
           const data = await collection.find({ date, Name: name }).toArray();
           res.json(data);
-        } else if (date) {
+        } else if (date && time) {
+          // If only date is provided, return all data for that specific date
+          const data = await collection.find({ date, time }).toArray();
+          res.json(data);
+        }
+        else if (date) {
           // If only date is provided, return all data for that specific date
           const data = await collection.find({ date }).toArray();
           res.json(data);
-        } else if (name) {
+        }else if (name) {
           // If only name is provided, return all data for that specific name
           const data = await collection.find({ Name: name }).toArray();
           res.json(data);
